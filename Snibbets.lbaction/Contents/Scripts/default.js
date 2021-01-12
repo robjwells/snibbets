@@ -7,16 +7,17 @@ function getSnippetsFolder() {
 }
 
 function run() {
-    settingsItem = {
+    const snippetsFolder = getSnippetsFolder()
+    const settingsItem = {
         'title' : 'Choose Snippets Folder',
         'action' : 'setFolder',
         'label' : 'Choose',
-        'subtitle' : getSnippetsFolder()
+        'subtitle' : snippetsFolder ? snippetsFolder : ""
     }
 
-    if (getSnippetsFolder()) {
+    if (snippetsFolder) {
         const files = File
-            .getDirectoryContents(getSnippetsFolder())
+            .getDirectoryContents(snippetsFolder)
             .sort()
             .map(fileName => {
                 return {
