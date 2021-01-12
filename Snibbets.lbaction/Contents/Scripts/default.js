@@ -6,6 +6,10 @@ function getSnippetsFolder() {
     return Action.preferences.snippetsFolder;
 }
 
+function basename(fileName) {
+    return fileName.slice(0, fileName.lastIndexOf("."))
+}
+
 function run() {
     const snippetsFolder = getSnippetsFolder()
     const settingsItem = {
@@ -20,10 +24,11 @@ function run() {
             .getDirectoryContents(snippetsFolder)
             .sort()
             .map(fileName => {
+                const name = basename(fileName)
                 return {
-                    title: fileName.slice(0, -3),
+                    title: name,
                     action: "firstFile",
-                    actionArgument: fileName.slice(0, 3),
+                    actionArgument: name,
                     actionReturnsItems: true
                 }
             })
