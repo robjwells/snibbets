@@ -28,7 +28,7 @@ function run() {
         'title' : 'Choose Snippets Folder',
         'action' : 'setFolder',
         'label' : 'Choose',
-        'subtitle' : snippetsFolder ? snippetsFolder : ""
+        'subtitle' : snippetsFolder ?? ""
     }
 
     if (snippetsFolder) {
