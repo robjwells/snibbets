@@ -13,7 +13,25 @@ function run() {
 		'label' : 'Choose',
 		'subtitle' : getSnippetsFolder()
 	}
-	return [settingsItem];
+
+    if (getSnippetsFolder()) {
+        const files = File
+            .getDirectoryContents(getSnippetsFolder())
+            .sort()
+            .map(fileName => {
+                return {
+                    title: fileName.slice(0, -3),
+                    action: "firstFile",
+                    actionArgument: fileName.slice(0, 3),
+                    actionReturnsItems: true
+                }
+            })
+        return files.concat([settingsItem])
+    } else {
+        return [settingsItem]
+    }
+}
+
 function invokeCLI(folder, string) {
     const result = LaunchBar.execute(
         '/usr/bin/env', 'ruby' , 'snibbets.rb',
@@ -24,6 +42,9 @@ function invokeCLI(folder, string) {
     return result ? JSON.parse(result) : NO_MATCHES
 }
 
+function firstFile(string) {
+    const result = runWithString(string)
+    return result !== NO_MATCHES ? result[0].children : result
 }
 
 function runWithString(string) {
