@@ -13,8 +13,8 @@ function basename(fileName) {
 function listFiles(folder) {
     return File.getDirectoryContents(folder)
         .sort()
-        .map(fileName => {
-            const name = basename(fileName)
+        .map(basename)
+        .map(name => {
             return {
                 title: name,
                 action: "firstFile",
