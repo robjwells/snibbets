@@ -57,19 +57,15 @@ function firstFile(string) {
     return result !== NO_MATCHES ? result[0].children : result
 }
 
-function hide() {
+
+function copyIt(item) {
+    LaunchBar.setClipboardString(item);
     LaunchBar.openCommandURL('hide'); // for some reason LaunchBar.hide() doesn't execute, but this does. Sometimes.
     LaunchBar.hide();
 }
 
-function copyIt(item) {
-    LaunchBar.setClipboardString(item);
-    hide()
-}
-
 function pasteIt(item) {
     LaunchBar.paste(item);
-    hide()
 }
 
 function promptForFolder(defaultFolder) {
