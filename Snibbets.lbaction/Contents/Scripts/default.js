@@ -81,7 +81,7 @@ function promptForFolder(defaultFolder) {
 function setFolder(item) {
     const defaultFolder = getSnippetsFolder() ?? LaunchBar.homeDirectory
     const selectedFolder = promptForFolder(defaultFolder)
-    if (selectedFolder && selectedFolder.trim().length > 0) {
+    if (selectedFolder?.trim().length > 0) {
         Action.preferences.snippetsFolder = selectedFolder.trim();
     }
 }
