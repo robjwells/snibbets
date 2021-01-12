@@ -262,9 +262,9 @@ if options[:launchbar]
       output << {
         'title' => result['title'],
         'quickLookURL' => %Q{file://#{result['path']}},
-        'action' => 'copyIt',
+        'action' => 'pasteIt',
         'actionArgument' => snippets[0]['code'],
-        'label' => 'Copy'
+        'label' => 'Paste'
       }
       next
     end
@@ -273,9 +273,9 @@ if options[:launchbar]
       children << {
         'title' => s['title'],
         'quickLookURL' => %Q{file://#{result['path']}},
-        'action' => 'copyIt',
+        'action' => 'pasteIt',
         'actionArgument' => s['code'],
-        'label' => 'Copy'
+        'label' => 'Paste'
       }
     }
 
