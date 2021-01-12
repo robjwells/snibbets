@@ -7,12 +7,12 @@ function getSnippetsFolder() {
 }
 
 function run() {
-	settingsItem = {
-		'title' : 'Choose Snippets Folder',
-		'action' : 'setFolder',
-		'label' : 'Choose',
-		'subtitle' : getSnippetsFolder()
-	}
+    settingsItem = {
+        'title' : 'Choose Snippets Folder',
+        'action' : 'setFolder',
+        'label' : 'Choose',
+        'subtitle' : getSnippetsFolder()
+    }
 
     if (getSnippetsFolder()) {
         const files = File
@@ -48,18 +48,18 @@ function firstFile(string) {
 }
 
 function runWithString(string) {
-	return invokeCLI(getSnippetsFolder(), string)
+    return invokeCLI(getSnippetsFolder(), string)
 }
 
 function copyIt(item) {
-	LaunchBar.setClipboardString(item);
-	LaunchBar.openCommandURL('hide'); // for some reason LaunchBar.hide() doesn't execute, but this does. Sometimes.
-	LaunchBar.hide();
+    LaunchBar.setClipboardString(item);
+    LaunchBar.openCommandURL('hide'); // for some reason LaunchBar.hide() doesn't execute, but this does. Sometimes.
+    LaunchBar.hide();
 }
 
 function pasteIt(item) {
-	LaunchBar.paste(item);
-	LaunchBar.hide();
+    LaunchBar.paste(item);
+    LaunchBar.hide();
 }
 
 function setFolder(item) {
@@ -68,7 +68,7 @@ function setFolder(item) {
   });
   var defaultFolder = LaunchBar.homeDirectory;
   if (Action.preferences.snippetsFolder) {
-  	defaultFolder = Action.preferences.snippetsFolder;
+    defaultFolder = Action.preferences.snippetsFolder;
   }
   var k = LaunchBar.executeAppleScript(
    'set _default to POSIX file "' + defaultFolder + '" as alias \n' +
