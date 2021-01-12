@@ -1,14 +1,15 @@
 // LaunchBar Action Script
 
+function getSnippetsFolder() {
+    return Action.preferences.snippetsFolder;
+}
+
 function run() {
 	settingsItem = {
 		'title' : 'Choose Snippets Folder',
 		'action' : 'setFolder',
 		'label' : 'Choose',
-		'subtitle' : ''
-	}
-	if (Action.preferences.snippetsFolder) {
-		settingsItem.subtitle = Action.preferences.snippetsFolder;
+		'subtitle' : getSnippetsFolder()
 	}
 	return [settingsItem];
 }
