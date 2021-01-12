@@ -7,7 +7,9 @@ function getSnippetsFolder() {
 }
 
 function basename(fileName) {
-    return fileName.slice(0, fileName.lastIndexOf("."))
+    return fileName.indexOf(".") === -1
+        ? fileName
+        : fileName.slice(0, fileName.lastIndexOf("."))
 }
 
 function listFiles(folder) {
