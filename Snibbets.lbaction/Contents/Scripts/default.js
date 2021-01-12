@@ -57,15 +57,19 @@ function runWithString(string) {
     return invokeCLI(getSnippetsFolder(), string)
 }
 
-function copyIt(item) {
-    LaunchBar.setClipboardString(item);
+function hide() {
     LaunchBar.openCommandURL('hide'); // for some reason LaunchBar.hide() doesn't execute, but this does. Sometimes.
     LaunchBar.hide();
 }
 
+function copyIt(item) {
+    LaunchBar.setClipboardString(item);
+    hide()
+}
+
 function pasteIt(item) {
     LaunchBar.paste(item);
-    LaunchBar.hide();
+    hide()
 }
 
 function setFolder(item) {
