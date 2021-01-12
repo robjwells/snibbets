@@ -73,11 +73,11 @@ function pasteIt(item) {
 }
 
 function promptForFolder(defaultFolder) {
-    const applescript = `\
-set _default to POSIX file "${defaultFolder}" as alias
-set _folder to choose folder with prompt "Select Snippets Folder" default location _default
-return POSIX path of _folder`
-    return LaunchBar.executeAppleScript(applescript)
+    return LaunchBar.executeAppleScript(`\
+        set _default to POSIX file "${defaultFolder}" as alias
+        set _folder to choose folder with prompt "Select Snippets Folder" default location _default
+        return POSIX path of _folder
+    `)
 }
 
 function setFolder(item) {
