@@ -1,5 +1,7 @@
 // LaunchBar Action Script
 
+const NO_MATCHES = {"title": "No matches"}
+
 function getSnippetsFolder() {
     return Action.preferences.snippetsFolder;
 }
@@ -12,15 +14,20 @@ function run() {
 		'subtitle' : getSnippetsFolder()
 	}
 	return [settingsItem];
+function invokeCLI(folder, string) {
+    const result = LaunchBar.execute(
+        '/usr/bin/env', 'ruby' , 'snibbets.rb',
+        '-o', 'launchbar',
+        '-s', encodeURI(folder),
+        encodeURI(string)
+    );
+    return result ? JSON.parse(result) : NO_MATCHES
+}
+
 }
 
 function runWithString(string) {
-	var folder = Action.preferences.snippetsFolder;
-	var result = LaunchBar.execute('/usr/bin/env', 'ruby' , 'snibbets.rb', '-o', 'launchbar', '-s', encodeURI(folder), encodeURI(string));
-	if (result)
-    	return JSON.parse(result);
-    else
-    	return {'title': 'No matches'}
+	return invokeCLI(getSnippetsFolder(), string)
 }
 
 function copyIt(item) {
