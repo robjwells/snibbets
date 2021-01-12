@@ -14,14 +14,12 @@ function listFiles(folder) {
     return File.getDirectoryContents(folder)
         .sort()
         .map(basename)
-        .map(name => {
-            return {
-                title: name,
-                action: "firstFile",
-                actionArgument: name,
-                actionReturnsItems: true
-            }
-        })
+        .map(name => ({
+            title: name,
+            action: "firstFile",
+            actionArgument: name,
+            actionReturnsItems: true
+        }))
 }
 
 function run() {
