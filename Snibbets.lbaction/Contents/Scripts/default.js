@@ -22,6 +22,16 @@ function listFiles(folder) {
         }))
 }
 
+function invokeCLI(folder, string) {
+    const result = LaunchBar.execute(
+        '/usr/bin/env', 'ruby' , 'snibbets.rb',
+        '-o', 'launchbar',
+        '-s', encodeURI(folder),
+        encodeURI(string)
+    );
+    return result ? JSON.parse(result) : NO_MATCHES
+}
+
 function run() {
     const snippetsFolder = getSnippetsFolder()
     const settingsItem = {
@@ -38,23 +48,13 @@ function run() {
     }
 }
 
-function invokeCLI(folder, string) {
-    const result = LaunchBar.execute(
-        '/usr/bin/env', 'ruby' , 'snibbets.rb',
-        '-o', 'launchbar',
-        '-s', encodeURI(folder),
-        encodeURI(string)
-    );
-    return result ? JSON.parse(result) : NO_MATCHES
+function runWithString(string) {
+    return invokeCLI(getSnippetsFolder(), string)
 }
 
 function firstFile(string) {
     const result = runWithString(string)
     return result !== NO_MATCHES ? result[0].children : result
-}
-
-function runWithString(string) {
-    return invokeCLI(getSnippetsFolder(), string)
 }
 
 function hide() {
