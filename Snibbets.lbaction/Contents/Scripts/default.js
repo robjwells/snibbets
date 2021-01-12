@@ -72,19 +72,19 @@ function pasteIt(item) {
     hide()
 }
 
+function promptForFolder(defaultFolder) {
+    const applescript = `\
+set _default to POSIX file "${defaultFolder}" as alias
+set _folder to choose folder with prompt "Select Snippets Folder" default location _default
+return POSIX path of _folder`
+    return LaunchBar.executeAppleScript(applescript)
+}
+
 function setFolder(item) {
-  LaunchBar.displayInLargeType({
-      title: 'Choosing folder'
-  });
-  var defaultFolder = LaunchBar.homeDirectory;
-  if (Action.preferences.snippetsFolder) {
-    defaultFolder = Action.preferences.snippetsFolder;
-  }
-  var k = LaunchBar.executeAppleScript(
-   'set _default to POSIX file "' + defaultFolder + '" as alias \n' +
-   'set _folder to choose folder with prompt "Select Snippets Folder" default location _default \n' +
-   ' return POSIX path of _folder');
-  if (k && k.length > 0) {
-    Action.preferences.snippetsFolder = k.trim();
-  }
+    LaunchBar.displayInLargeType({title: 'Choosing folder'});
+    const defaultFolder = getSnippetsFolder() ?? LaunchBar.homeDirectory
+    const selectedFolder = promptForFolder(defaultFolder)
+    if (selectedFolder && selectedFolder.trim().length > 0) {
+        Action.preferences.snippetsFolder = selectedFolder.trim();
+    }
 }
