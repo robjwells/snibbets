@@ -81,7 +81,6 @@ return POSIX path of _folder`
 }
 
 function setFolder(item) {
-    LaunchBar.displayInLargeType({title: 'Choosing folder'});
     const defaultFolder = getSnippetsFolder() ?? LaunchBar.homeDirectory
     const selectedFolder = promptForFolder(defaultFolder)
     if (selectedFolder && selectedFolder.trim().length > 0) {
