@@ -58,7 +58,6 @@ function copyIt(item) {
 }
 
 function pasteIt(item) {
-	LaunchBar.openCommandURL('hide');
 	LaunchBar.paste(item);
 	LaunchBar.hide();
 }
