@@ -10,6 +10,20 @@ function basename(fileName) {
     return fileName.slice(0, fileName.lastIndexOf("."))
 }
 
+function listFiles(folder) {
+    return File.getDirectoryContents(folder)
+        .sort()
+        .map(fileName => {
+            const name = basename(fileName)
+            return {
+                title: name,
+                action: "firstFile",
+                actionArgument: name,
+                actionReturnsItems: true
+            }
+        })
+}
+
 function run() {
     const snippetsFolder = getSnippetsFolder()
     const settingsItem = {
@@ -20,19 +34,7 @@ function run() {
     }
 
     if (snippetsFolder) {
-        const files = File
-            .getDirectoryContents(snippetsFolder)
-            .sort()
-            .map(fileName => {
-                const name = basename(fileName)
-                return {
-                    title: name,
-                    action: "firstFile",
-                    actionArgument: name,
-                    actionReturnsItems: true
-                }
-            })
-        return files.concat([settingsItem])
+        return listFiles(snippetsFolder).concat([settingsItem])
     } else {
         return [settingsItem]
     }
