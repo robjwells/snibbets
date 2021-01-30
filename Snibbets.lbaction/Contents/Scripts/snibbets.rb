@@ -91,7 +91,6 @@ end
 
 # Generate a numbered menu, items passed must have a title property
 def menu(res,title="Select one")
-  trap('INT') { system('stty', stty_save); exit }
 
   counter = 1
   $stderr.puts
