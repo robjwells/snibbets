@@ -56,29 +56,20 @@ class String
     code.join("\n")
   end
 
-  # Returns an array of snippets. Single snippets are returned without a
-  # title, multiple snippets get titles from header lines
+  # Returns an array of snippets, with a title from the preceding header line.
   def snippets
-    content = self.dup
-
     # Split content by ATX headers. Everything on the line after the #
     # becomes the title, code is gleaned from text between that and the
     # next ATX header (or end)
-    sections = []
-    parts = content.split(/^#+/)[1..]
+    parts = self.split(/^#+/)[1..]
 
-    parts.each {|p|
-      lines = p.split(/\n/)
-      title = lines.shift.strip.sub(/[.:]$/,'')
-      block = lines.join("\n")
-      code = block.clean_code
-      if code && code.length > 0
-        sections << {
-          'title' => title,
-          'code' => code.strip
-        }
-      end
-    }
+    sections = parts.map do |part|
+      first, *rest = part.split("\n")
+      title = first.strip.sub(/[.:]$/, '')
+      code = rest.join("\n").clean_code.strip
+      code.empty? ? {} : { 'title' => title, 'code' => code }
+    end.reject { |x| x.empty? }  # Filter out sections without code.
+
     return sections
   end
 end
