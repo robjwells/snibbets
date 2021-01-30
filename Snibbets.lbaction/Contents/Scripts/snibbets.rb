@@ -146,7 +146,7 @@ def search(query, folder, first_try = true)
 
   if results.empty? && first_try
     # if no results on the first try, try again searching all text
-    return search(query, folder, :first_try => false)
+    return search(query, folder, false)
   end
 
   return results
