@@ -138,10 +138,7 @@ def search(query, folder, first_try = true)
   matches = %x{#{cmd}}.strip
 
   results = matches.split(/\n/).map do |line|
-    {
-      'title' => File.basename(line,'.*'),
-      'path' => line
-    }
+    { 'title' => File.basename(line, '.*'), 'path' => line }
   end
 
   if results.empty? && first_try
