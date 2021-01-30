@@ -90,14 +90,10 @@ end
 
 # Generate a numbered menu, items passed must have a title property
 def menu(res,title="Select one")
-
-  counter = 1
-  $stderr.puts
-  res.each do |match|
-    $stderr.printf("%2d) %s\n", counter, match['title'])
-    counter += 1
+  lines = res.zip(1..).map do |match, count|
+    "%2d) #{match['title']}" % count
   end
-  $stderr.puts
+  $stderr.puts "\n" + lines.join("\n") + "\n\n"
 
   begin
     $stderr.printf(title.sub(/:?$/,": "),res.length)
