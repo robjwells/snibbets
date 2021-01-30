@@ -209,32 +209,31 @@ end
 results = search(query,options[:source])
 
 if options[:launchbar]
-  if results.length == 0
-    out = {
-      'title' => "No matching snippets found"
-    }.to_json
+  if results.empty?
+    out = { 'title' => "No matching snippets found" }.to_json
     puts out
     Process.exit
   end
 
   output = results.map do |result|
-    input = IO.read(result['path'])
-    snippets = input.snippets
-    next if snippets.length == 0
+    title = result["title"]
+    path = result["path"]
+    snippets = IO.read(path).snippets
+    next if snippets.empty?
 
-    children = snippets.map do |s|
+    children = snippets.map do |snippet|
       {
-        'title' => s['title'],
-        'quickLookURL' => %Q{file://#{result['path']}},
+        'title' => snippet['title'],
+        'quickLookURL' => %Q{file://#{path}},
         'action' => 'pasteIt',
-        'actionArgument' => s['code'],
+        'actionArgument' => snippet['code'],
         'label' => 'Paste'
       }
     end
 
     {
-      'title' => result['title'],
-      'quickLookURL' => %Q{file://#{result['path']}},
+      'title' => title,
+      'quickLookURL' => %Q{file://#{path}},
       'children' => children
     }
   end
