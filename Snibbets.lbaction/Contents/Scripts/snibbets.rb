@@ -237,8 +237,6 @@ end
 results = search(query,options[:source])
 
 if options[:launchbar]
-  output = []
-
   if results.length == 0
     out = {
       'title' => "No matching snippets found"
@@ -247,7 +245,7 @@ if options[:launchbar]
     Process.exit
   end
 
-  results.each {|result|
+  output = results.map {|result|
     input = IO.read(result['path'])
     snippets = input.snippets
     next if snippets.length == 0
@@ -262,7 +260,7 @@ if options[:launchbar]
       }
     }
 
-    output << {
+    {
       'title' => result['title'],
       'quickLookURL' => %Q{file://#{result['path']}},
       'children' => children
