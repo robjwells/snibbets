@@ -65,8 +65,7 @@ class String
     # becomes the title, code is gleaned from text between that and the
     # next ATX header (or end)
     sections = []
-    parts = content.split(/^#+/)
-    parts.shift
+    parts = content.split(/^#+/)[1..]
 
     parts.each {|p|
       lines = p.split(/\n/)
@@ -84,39 +83,32 @@ class String
   end
 end
 
+def quit
+  system('stty', `stty -g`.chomp)
+  exit
+end
+
 # Generate a numbered menu, items passed must have a title property
 def menu(res,title="Select one")
-  stty_save = `stty -g`.chomp
-  trap('INT') { system('stty', stty_save); exit }
-
-  # Generate a numbered menu, items passed must have a title property('INT') { system('stty', stty_save); exit }
-  counter = 1
-  $stderr.puts
-  res.each do |match|
-    $stderr.printf("%2d) %s\n", counter, match['title'])
-    counter += 1
+  lines = res.zip(1..).map do |match, count|
+    "%2d) #{match['title']}" % count
   end
-  $stderr.puts
+  $stderr.puts "\n" + lines.join("\n") + "\n\n"
 
   begin
     $stderr.printf(title.sub(/:?$/,": "),res.length)
-    while line = Readline.readline("", true)
-      unless line =~ /^[0-9]/
-        system('stty', stty_save) # Restore
-        exit
-      end
+    while line = $stdin.readline(:chomp => true)
+      quit unless line =~ /^[0-9]/
       line = line.to_i
       if (line > 0 && line <= res.length)
         return res[line - 1]
-        break
       else
         $stderr.puts "Out of range"
-        menu(res,title)
+        return menu(res,title)
       end
     end
-  rescue Interrupt => e
-    system('stty', stty_save)
-    exit
+  rescue Interrupt, EOFError => e
+    quit
   end
 end
 
@@ -127,22 +119,19 @@ def search_spotlight(query,folder,try=0)
 
   matches = %x{mdfind -onlyin "#{folder}" #{nameonly}'#{query}'}.strip
 
-  results = []
-  if matches.length > 0
-    lines = matches.split(/\n/)
-    lines.each {|l|
-      results << {
-        'title' => File.basename(l,'.md'),
-        'path' => l
-      }
+  results = matches.split(/\n/).map do |line|
+    {
+      'title' => File.basename(line, '.md'),
+      'path' => line
     }
-    return results
-  else
-    if try == 0
+  end
+
+  if results.empty? && try == 0
       # if no results on the first try, try again searching all text
       return search_spotlight(query,folder,1)
-    end
   end
+
+  return results
 end
 
 # Search the snippets directory for query using find and grep
@@ -158,25 +147,19 @@ def search(query,folder,try=0)
 
   matches = %x{#{cmd}}.strip
 
-  results = []
-
-  if matches.length > 0
-    lines = matches.split(/\n/)
-    lines.each {|l|
-      results << {
-        'title' => File.basename(l,'.*'),
-        'path' => l
-      }
+  results = matches.split(/\n/).map do |line|
+    {
+      'title' => File.basename(line,'.*'),
+      'path' => line
     }
-    return results
-  else
-    if try == 0
-      # if no results on the first try, try again searching all text
-      return search(query,folder,1)
-    else
-      return results
-    end
   end
+
+  if results.empty? && try == 0
+    # if no results on the first try, try again searching all text
+    return search(query,folder,1)
+  end
+
+  return results
 end
 
 
@@ -215,18 +198,10 @@ end
 
 optparse.parse!
 
-query = ''
-
-if options[:launchbar]
-  if STDIN.stat.size >0
-    query = STDIN.read.force_encoding('utf-8')
-  else
-    query = ARGV.join(" ")
-  end
+if options[:launchbar] && STDIN.stat.size > 0
+  query = STDIN.read.force_encoding('utf-8')
 else
-  if ARGV.length
-    query = ARGV.join(" ")
-  end
+  query = ARGV.join(" ")  # If ARGV is empty, so is the query.
 end
 
 query = CGI.unescape(query)
