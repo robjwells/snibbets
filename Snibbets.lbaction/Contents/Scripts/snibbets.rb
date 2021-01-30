@@ -43,7 +43,7 @@ class String
     inblock = false
     code = []
     block.split(/\n/).each {|line|
-      if line =~ /^\s*$/ && inblock
+      if line.strip.empty? && inblock
         code.push(line)
       elsif line =~ /^( {4,}|\t+)/
         inblock = true
