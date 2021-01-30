@@ -58,10 +58,6 @@ class String
   # title, multiple snippets get titles from header lines
   def snippets
     content = self.dup
-    # If there's only one snippet, just clean it and return
-    unless self.multiple?
-      return [{"title" => "", "code" => content.clean_code.strip}]
-    end
 
     # Split content by ATX headers. Everything on the line after the #
     # becomes the title, code is gleaned from text between that and the
@@ -256,21 +252,8 @@ if options[:launchbar]
     snippets = input.snippets
     next if snippets.length == 0
 
-    children = []
-
-    if snippets.length == 1
-      output << {
-        'title' => result['title'],
-        'quickLookURL' => %Q{file://#{result['path']}},
-        'action' => 'pasteIt',
-        'actionArgument' => snippets[0]['code'],
-        'label' => 'Paste'
-      }
-      next
-    end
-
-    snippets.each {|s|
-      children << {
+    children = snippets.map {|s|
+      {
         'title' => s['title'],
         'quickLookURL' => %Q{file://#{result['path']}},
         'action' => 'pasteIt',
