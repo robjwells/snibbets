@@ -119,22 +119,19 @@ def search_spotlight(query,folder,try=0)
 
   matches = %x{mdfind -onlyin "#{folder}" #{nameonly}'#{query}'}.strip
 
-  results = []
-  if matches.length > 0
-    lines = matches.split(/\n/)
-    lines.each {|l|
-      results << {
-        'title' => File.basename(l,'.md'),
-        'path' => l
-      }
+  results = matches.split(/\n/).map do |line|
+    {
+      'title' => File.basename(line, '.md'),
+      'path' => line
     }
-    return results
-  else
-    if try == 0
+  end
+
+  if results.empty? && try == 0
       # if no results on the first try, try again searching all text
       return search_spotlight(query,folder,1)
-    end
   end
+
+  return results
 end
 
 # Search the snippets directory for query using find and grep
@@ -150,25 +147,19 @@ def search(query,folder,try=0)
 
   matches = %x{#{cmd}}.strip
 
-  results = []
-
-  if matches.length > 0
-    lines = matches.split(/\n/)
-    lines.each {|l|
-      results << {
-        'title' => File.basename(l,'.*'),
-        'path' => l
-      }
+  results = matches.split(/\n/).map do |line|
+    {
+      'title' => File.basename(line,'.*'),
+      'path' => line
     }
-    return results
-  else
-    if try == 0
-      # if no results on the first try, try again searching all text
-      return search(query,folder,1)
-    else
-      return results
-    end
   end
+
+  if results.empty? && try == 0
+    # if no results on the first try, try again searching all text
+    return search(query,folder,1)
+  end
+
+  return results
 end
 
 
