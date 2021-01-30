@@ -7,7 +7,9 @@ require 'json'
 require 'cgi'
 require 'logger'
 
-$search_path = "/Users/ttscoff/Desktop/Code/snippets"
+$search_path = File.expand_path(
+  ENV['SNIBBETS_PATH'] || "~/Dropbox/notes/snippets"
+)
 
 class String
   # Are there multiple snippets (indicated by ATX headers)
