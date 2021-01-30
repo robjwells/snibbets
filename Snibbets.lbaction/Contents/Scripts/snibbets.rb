@@ -135,10 +135,9 @@ def search_spotlight(query,folder,try=0)
 end
 
 # Search the snippets directory for query using find and grep
-def search(query,folder,try=0)
+def search(query, folder, first_try = true)
   # First try only search by filenames
 
-  if try > 0
     cmd = %Q{grep -iEl '#{query.rx}' "#{folder}/"*}
   else
     escaped_folder = Regexp.escape(folder)
@@ -154,9 +153,9 @@ def search(query,folder,try=0)
     }
   end
 
-  if results.empty? && try == 0
+  if results.empty? && first_try
     # if no results on the first try, try again searching all text
-    return search(query,folder,1)
+    return search(query, folder, :first_try => false)
   end
 
   return results
