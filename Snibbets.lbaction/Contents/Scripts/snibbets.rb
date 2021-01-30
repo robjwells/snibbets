@@ -198,18 +198,10 @@ end
 
 optparse.parse!
 
-query = ''
-
-if options[:launchbar]
-  if STDIN.stat.size >0
-    query = STDIN.read.force_encoding('utf-8')
-  else
-    query = ARGV.join(" ")
-  end
+if options[:launchbar] && STDIN.stat.size > 0
+  query = STDIN.read.force_encoding('utf-8')
 else
-  if ARGV.length
-    query = ARGV.join(" ")
-  end
+  query = ARGV.join(" ")  # If ARGV is empty, so is the query.
 end
 
 query = CGI.unescape(query)
