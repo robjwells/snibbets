@@ -245,12 +245,12 @@ if options[:launchbar]
     Process.exit
   end
 
-  output = results.map {|result|
+  output = results.map do |result|
     input = IO.read(result['path'])
     snippets = input.snippets
     next if snippets.length == 0
 
-    children = snippets.map {|s|
+    children = snippets.map do |s|
       {
         'title' => s['title'],
         'quickLookURL' => %Q{file://#{result['path']}},
@@ -258,14 +258,14 @@ if options[:launchbar]
         'actionArgument' => s['code'],
         'label' => 'Paste'
       }
-    }
+    end
 
     {
       'title' => result['title'],
       'quickLookURL' => %Q{file://#{result['path']}},
       'children' => children
     }
-  }
+  end
 
   puts output.to_json
 else
