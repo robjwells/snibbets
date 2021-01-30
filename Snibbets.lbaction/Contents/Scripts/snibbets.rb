@@ -157,9 +157,6 @@ options = {}
 
 optparse = OptionParser.new do|opts|
   opts.banner = "Usage: #{File.basename(__FILE__)} [options] query"
-  # opts.on( '-l', '--launchbar', 'Format results for use in LaunchBar') do
-  #   options[:launchbar] = true
-  # end
   options[:interactive] = true
   opts.on( '-q', '--quiet', 'Skip menus and display first match') do
     options[:interactive] = false
@@ -169,11 +166,12 @@ optparse = OptionParser.new do|opts|
   options[:output] = "raw"
   opts.on( '-o', '--output FORMAT', 'Output format (launchbar or raw)' ) do |outformat|
     valid = %w(json launchbar lb raw)
-    if outformat.downcase =~ /(launchbar|lb)/
+    outformat = outformat.downcase
+    if outformat =~ /(launchbar|lb)/
       options[:launchbar] = true
       options[:interactive] = false
     else
-      options[:output] = outformat.downcase if valid.include?(outformat.downcase)
+      options[:output] = outformat if valid.include?(outformat)
     end
   end
   options[:source] = File.expand_path($search_path)
