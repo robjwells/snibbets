@@ -102,7 +102,7 @@ def menu(res,title="Select one")
 
   begin
     $stderr.printf(title.sub(/:?$/,": "),res.length)
-    while line = Readline.readline("", true)
+    while line = $stdin.readline(:chomp => true)
       quit unless line =~ /^[0-9]/
       line = line.to_i
       if (line > 0 && line <= res.length)
@@ -113,7 +113,7 @@ def menu(res,title="Select one")
         return menu(res,title)
       end
     end
-  rescue Interrupt => e
+  rescue Interrupt, EOFError => e
     quit
   end
 end
