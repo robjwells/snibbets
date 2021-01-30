@@ -84,12 +84,15 @@ class String
   end
 end
 
+def quit
+  system('stty', `stty -g`.chomp)
+  exit
+end
+
 # Generate a numbered menu, items passed must have a title property
 def menu(res,title="Select one")
-  stty_save = `stty -g`.chomp
   trap('INT') { system('stty', stty_save); exit }
 
-  # Generate a numbered menu, items passed must have a title property('INT') { system('stty', stty_save); exit }
   counter = 1
   $stderr.puts
   res.each do |match|
@@ -101,10 +104,7 @@ def menu(res,title="Select one")
   begin
     $stderr.printf(title.sub(/:?$/,": "),res.length)
     while line = Readline.readline("", true)
-      unless line =~ /^[0-9]/
-        system('stty', stty_save) # Restore
-        exit
-      end
+      quit unless line =~ /^[0-9]/
       line = line.to_i
       if (line > 0 && line <= res.length)
         return res[line - 1]
@@ -115,8 +115,7 @@ def menu(res,title="Select one")
       end
     end
   rescue Interrupt => e
-    system('stty', stty_save)
-    exit
+    quit
   end
 end
 
