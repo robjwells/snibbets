@@ -206,15 +206,21 @@ if query.strip.empty?
   Process.exit 1
 end
 
-results = search(query,options[:source])
+results = search(query, options[:source])
 
-if options[:launchbar]
-  if results.empty?
+# No results.
+if results.empty?
+  if options[:launchbar]
     out = { 'title' => "No matching snippets found" }.to_json
     puts out
-    Process.exit
+  else
+    $stderr.puts "No results"
   end
+  Process.exit 0
+end
 
+# At least some results.
+if options[:launchbar]
   output = results.map do |result|
     title = result["title"]
     path = result["path"]
@@ -239,33 +245,20 @@ if options[:launchbar]
   end
 
   puts output.to_json
+elsif !options[:interactive]
+  snippets = IO.read(results[0]["path"]).snippets
+  code_only = snippets.map { |s| s["code"] }
+  output = options[:output] == 'json' ? snippets.to_json : code_only
+  $stdout.puts output
 else
-  if results.length == 0
-    $stderr.puts "No results"
-    Process.exit 0
-  elsif results.length == 1 || !options[:interactive]
-    input = IO.read(results[0]['path'])
-  else
-    answer = menu(results,"Select a file")
-    input = IO.read(answer['path'])
-  end
+  chosen_file = menu(results, "Select a file")
+  snippets = IO.read(chosen_file["path"]).snippets
 
-
-  snippets = input.snippets
-
-  if snippets.length == 0
+  if snippets.empty?
     $stderr.puts "No snippets found"
     Process.exit 0
-  elsif snippets.length == 1 || !options[:interactive]
-    if options[:output] == 'json'
-      $stdout.puts snippets.to_json
-    else
-      snippets.each {|snip|
-        $stdout.puts snip['code']
-      }
-    end
-  elsif snippets.length > 1
-    answer = menu(snippets,"Select snippet")
-    $stdout.puts answer['code']
   end
+
+  chosen_snippet = menu(snippets, "Select snippet")
+  $stdout.puts chosen_snippet['code']
 end
