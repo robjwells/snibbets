@@ -43,7 +43,7 @@ class String
     inblock = false
     code = []
     block.split(/\n/).each {|line|
-      if line =~ /^\s*$/ && inblock
+      if line.strip.empty? && inblock
         code.push(line)
       elsif line =~ /^( {4,}|\t+)/
         inblock = true
@@ -56,29 +56,20 @@ class String
     code.join("\n")
   end
 
-  # Returns an array of snippets. Single snippets are returned without a
-  # title, multiple snippets get titles from header lines
+  # Returns an array of snippets, with a title from the preceding header line.
   def snippets
-    content = self.dup
-
     # Split content by ATX headers. Everything on the line after the #
     # becomes the title, code is gleaned from text between that and the
     # next ATX header (or end)
-    sections = []
-    parts = content.split(/^#+/)[1..]
+    parts = self.split(/^#+/)[1..]
 
-    parts.each {|p|
-      lines = p.split(/\n/)
-      title = lines.shift.strip.sub(/[.:]$/,'')
-      block = lines.join("\n")
-      code = block.clean_code
-      if code && code.length > 0
-        sections << {
-          'title' => title,
-          'code' => code.strip
-        }
-      end
-    }
+    sections = parts.map do |part|
+      first, *rest = part.split("\n")
+      title = first.strip.sub(/[.:]$/, '')
+      code = rest.join("\n").clean_code.strip
+      code.empty? ? {} : { 'title' => title, 'code' => code }
+    end.reject { |x| x.empty? }  # Filter out sections without code.
+
     return sections
   end
 end
@@ -135,28 +126,24 @@ def search_spotlight(query,folder,try=0)
 end
 
 # Search the snippets directory for query using find and grep
-def search(query,folder,try=0)
+def search(query, folder, first_try = true)
   # First try only search by filenames
 
-  if try > 0
-    cmd = %Q{grep -iEl '#{query.rx}' "#{folder}/"*}
+  cmd = if first_try
+    %Q{find "#{folder}" -iregex '^#{Regexp.escape(folder)}/#{query.rx}'}
   else
-    escaped_folder = Regexp.escape(folder)
-    cmd = %Q{find "#{folder}" -iregex '^#{escaped_folder}/#{query.rx}'}
+    %Q{grep -iEl '#{query.rx}' "#{folder}/"*}
   end
 
   matches = %x{#{cmd}}.strip
 
   results = matches.split(/\n/).map do |line|
-    {
-      'title' => File.basename(line,'.*'),
-      'path' => line
-    }
+    { 'title' => File.basename(line, '.*'), 'path' => line }
   end
 
-  if results.empty? && try == 0
+  if results.empty? && first_try
     # if no results on the first try, try again searching all text
-    return search(query,folder,1)
+    return search(query, folder, false)
   end
 
   return results
@@ -167,41 +154,45 @@ options = {}
 
 optparse = OptionParser.new do|opts|
   opts.banner = "Usage: #{File.basename(__FILE__)} [options] query"
-  # opts.on( '-l', '--launchbar', 'Format results for use in LaunchBar') do
-  #   options[:launchbar] = true
-  # end
-  options[:interactive] = true
-  opts.on( '-q', '--quiet', 'Skip menus and display first match') do
-    options[:interactive] = false
-    options[:launchbar] = false
-  end
-  options[:launchbar] = false
-  options[:output] = "raw"
-  opts.on( '-o', '--output FORMAT', 'Output format (launchbar or raw)' ) do |outformat|
-    valid = %w(json launchbar lb raw)
-    if outformat.downcase =~ /(launchbar|lb)/
-      options[:launchbar] = true
-      options[:interactive] = false
-    else
-      options[:output] = outformat.downcase if valid.include?(outformat.downcase)
-    end
-  end
-  options[:source] = File.expand_path($search_path)
-  opts.on('-s', '--source FOLDER', 'Snippets folder to search') do |folder|
-    options[:source] = File.expand_path(folder)
-  end
+
   opts.on("-h","--help",'Display this screen') do
     puts optparse
     Process.exit 0
   end
+
+  # Set defaults.
+  options[:interactive] = true
+  options[:launchbar] = false
+  options[:output] = "raw"
+  options[:source] = File.expand_path($search_path)
+
+  opts.on( '-q', '--quiet', 'Skip menus and display first match') do
+    options[:interactive] = false
+  end
+
+  valid_formats = %w(json launchbar lb raw)
+  opts.on( '-o', '--output FORMAT', "Output format (#{valid_formats.join(', ')})" ) do |outformat|
+    outformat = outformat.strip.downcase
+    if outformat =~ /^(lb|launchbar)$/
+      options[:launchbar] = true
+      options[:interactive] = false
+    else
+      options[:output] = outformat if valid_formats.include?(outformat)
+    end
+  end
+
+  opts.on('-s', '--source FOLDER', 'Snippets folder to search') do |folder|
+    options[:source] = File.expand_path(folder)
+  end
+
 end
 
 optparse.parse!
 
-if options[:launchbar] && STDIN.stat.size > 0
-  query = STDIN.read.force_encoding('utf-8')
+query = if options[:launchbar] && STDIN.stat.size > 0
+  STDIN.read.force_encoding('utf-8')
 else
-  query = ARGV.join(" ")  # If ARGV is empty, so is the query.
+  ARGV.join(" ")  # If ARGV is empty, so is the query.
 end
 
 query = CGI.unescape(query)
@@ -212,67 +203,59 @@ if query.strip.empty?
   Process.exit 1
 end
 
-results = search(query,options[:source])
+results = search(query, options[:source])
 
-if options[:launchbar]
-  if results.length == 0
-    out = {
-      'title' => "No matching snippets found"
-    }.to_json
+# No results.
+if results.empty?
+  if options[:launchbar]
+    out = { 'title' => "No matching snippets found" }.to_json
     puts out
-    Process.exit
+  else
+    $stderr.puts "No results"
   end
+  Process.exit 0
+end
 
+# At least some results.
+if options[:launchbar]
   output = results.map do |result|
-    input = IO.read(result['path'])
-    snippets = input.snippets
-    next if snippets.length == 0
+    title = result["title"]
+    path = result["path"]
+    snippets = IO.read(path).snippets
+    next if snippets.empty?
 
-    children = snippets.map do |s|
+    children = snippets.map do |snippet|
       {
-        'title' => s['title'],
-        'quickLookURL' => %Q{file://#{result['path']}},
+        'title' => snippet['title'],
+        'quickLookURL' => %Q{file://#{path}},
         'action' => 'pasteIt',
-        'actionArgument' => s['code'],
+        'actionArgument' => snippet['code'],
         'label' => 'Paste'
       }
     end
 
     {
-      'title' => result['title'],
-      'quickLookURL' => %Q{file://#{result['path']}},
+      'title' => title,
+      'quickLookURL' => %Q{file://#{path}},
       'children' => children
     }
   end
 
   puts output.to_json
+elsif !options[:interactive]
+  snippets = IO.read(results[0]["path"]).snippets
+  code_only = snippets.map { |s| s["code"] }
+  output = options[:output] == 'json' ? snippets.to_json : code_only
+  $stdout.puts output
 else
-  if results.length == 0
-    $stderr.puts "No results"
-    Process.exit 0
-  elsif results.length == 1 || !options[:interactive]
-    input = IO.read(results[0]['path'])
-  else
-    answer = menu(results,"Select a file")
-    input = IO.read(answer['path'])
-  end
+  chosen_file = menu(results, "Select a file")
+  snippets = IO.read(chosen_file["path"]).snippets
 
-
-  snippets = input.snippets
-
-  if snippets.length == 0
+  if snippets.empty?
     $stderr.puts "No snippets found"
     Process.exit 0
-  elsif snippets.length == 1 || !options[:interactive]
-    if options[:output] == 'json'
-      $stdout.puts snippets.to_json
-    else
-      snippets.each {|snip|
-        $stdout.puts snip['code']
-      }
-    end
-  elsif snippets.length > 1
-    answer = menu(snippets,"Select snippet")
-    $stdout.puts answer['code']
   end
+
+  chosen_snippet = menu(snippets, "Select snippet")
+  $stdout.puts chosen_snippet['code']
 end
