@@ -65,8 +65,7 @@ class String
     # becomes the title, code is gleaned from text between that and the
     # next ATX header (or end)
     sections = []
-    parts = content.split(/^#+/)
-    parts.shift
+    parts = content.split(/^#+/)[1..]
 
     parts.each {|p|
       lines = p.split(/\n/)
