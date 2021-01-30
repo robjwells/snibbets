@@ -157,31 +157,37 @@ options = {}
 
 optparse = OptionParser.new do|opts|
   opts.banner = "Usage: #{File.basename(__FILE__)} [options] query"
-  options[:interactive] = true
-  opts.on( '-q', '--quiet', 'Skip menus and display first match') do
-    options[:interactive] = false
-    options[:launchbar] = false
-  end
-  options[:launchbar] = false
-  options[:output] = "raw"
-  opts.on( '-o', '--output FORMAT', 'Output format (launchbar or raw)' ) do |outformat|
-    valid = %w(json launchbar lb raw)
-    outformat = outformat.downcase
-    if outformat =~ /(launchbar|lb)/
-      options[:launchbar] = true
-      options[:interactive] = false
-    else
-      options[:output] = outformat if valid.include?(outformat)
-    end
-  end
-  options[:source] = File.expand_path($search_path)
-  opts.on('-s', '--source FOLDER', 'Snippets folder to search') do |folder|
-    options[:source] = File.expand_path(folder)
-  end
+
   opts.on("-h","--help",'Display this screen') do
     puts optparse
     Process.exit 0
   end
+
+  # Set defaults.
+  options[:interactive] = true
+  options[:launchbar] = false
+  options[:output] = "raw"
+  options[:source] = File.expand_path($search_path)
+
+  opts.on( '-q', '--quiet', 'Skip menus and display first match') do
+    options[:interactive] = false
+  end
+
+  valid_formats = %w(json launchbar lb raw)
+  opts.on( '-o', '--output FORMAT', "Output format (#{valid_formats.join(', ')})" ) do |outformat|
+    outformat = outformat.strip.downcase
+    if outformat =~ /^(lb|launchbar)$/
+      options[:launchbar] = true
+      options[:interactive] = false
+    else
+      options[:output] = outformat if valid_formats.include?(outformat)
+    end
+  end
+
+  opts.on('-s', '--source FOLDER', 'Snippets folder to search') do |folder|
+    options[:source] = File.expand_path(folder)
+  end
+
 end
 
 optparse.parse!
