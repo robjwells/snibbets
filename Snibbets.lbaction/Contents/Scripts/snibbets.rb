@@ -107,7 +107,6 @@ def menu(res,title="Select one")
       line = line.to_i
       if (line > 0 && line <= res.length)
         return res[line - 1]
-        break
       else
         $stderr.puts "Out of range"
         return menu(res,title)
