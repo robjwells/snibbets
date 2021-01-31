@@ -81,9 +81,8 @@ def menu(res,title="Select one")
     "%2d) #{match['title']}" % count
   end
   $stderr.puts "\n" + lines.join("\n") + "\n\n"
-
+  $stderr.print(title.sub(/:?$/,": "), res.length)
   begin
-    $stderr.print(title.sub(/:?$/,": "), res.length)
     line = $stdin.readline(:chomp => true)
     quit unless line =~ /^[0-9]/
     line = line.to_i
