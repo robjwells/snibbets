@@ -80,7 +80,7 @@ end
 # Generate a numbered menu, items passed must have a title property
 def menu(res, title = "Select one")
   lines = res.zip(1..).map do |match, count|
-    "%2d) #{match[:title]}" % count
+    "%2d) #{match.fetch(:title)}" % count
   end
   $stderr.puts "\n" + lines.join("\n") + "\n\n"
   $stderr.print title.sub(/:?$/,": ")
@@ -176,7 +176,7 @@ def parse_options
 end
 
 def construct_query(options)
-  if options[:launchbar] && STDIN.stat.size > 0
+  if options.fetch(:launchbar) && STDIN.stat.size > 0
     STDIN.read.force_encoding('utf-8')
   else
     ARGV.join(" ")  # If ARGV is empty, so is the query.
@@ -193,17 +193,17 @@ end
 
 def build_launchbar_output(results)
   results.map do |result|
-    title = result[:title]
-    path = result[:path]
+    title = result.fetch(:title)
+    path = result.fetch(:path)
     snippets = IO.read(path).snippets
     next if snippets.empty?
 
     children = snippets.map do |snippet|
       {
-        title: snippet[:title],
+        title: snippet.fetch(:title),
         quickLookURL: %Q{file://#{path}},
         action: 'pasteIt',
-        actionArgument: snippet[:code],
+        actionArgument: snippet.fetch(:code),
         label: 'Paste'
       }
     end
@@ -219,11 +219,11 @@ end
 options, help_message = parse_options()
 query = CGI.unescape(construct_query(options))
 validate_query!(query, help_message)
-results = search(query, options[:source])
+results = search(query, options.fetch(:source))
 
 # No results.
 if results.empty?
-  if options[:launchbar]
+  if options.fetch(:launchbar)
     out = { title: "No matching snippets found" }.to_json
     $stdout.puts out
   else
@@ -233,16 +233,16 @@ if results.empty?
 end
 
 # At least some results.
-if options[:launchbar]
+if options.fetch(:launchbar)
   puts build_launchbar_output(results).to_json
-elsif !options[:interactive]
-  snippets = IO.read(results.first[:path]).snippets
-  code_only = snippets.map { |s| s[:code] }
-  output = options[:output] == 'json' ? snippets.to_json : code_only
+elsif !options.fetch(:interactive)
+  snippets = IO.read(results.first.fetch(:path)).snippets
+  code_only = snippets.map { |s| s.fetch(:code) }
+  output = options.fetch(:output) == 'json' ? snippets.to_json : code_only
   $stdout.puts output
 else
   chosen_file = menu(results, "Select a file")
-  snippets = IO.read(chosen_file[:path]).snippets
+  snippets = IO.read(chosen_file.fetch(:path)).snippets
 
   if snippets.empty?
     $stderr.puts "No snippets found"
@@ -250,5 +250,5 @@ else
   end
 
   chosen_snippet = menu(snippets, "Select snippet")
-  $stdout.puts chosen_snippet[:code]
+  $stdout.puts chosen_snippet.fetch(:code)
 end
