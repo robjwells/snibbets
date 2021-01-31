@@ -24,7 +24,7 @@ class String
   end
 
   def rx
-    ".*" + gsub(/\s+/,'.*') + ".*"
+    format('.*%s.*', gsub(/\s+/, '.*'))
   end
 
   def strip_fences
@@ -80,9 +80,9 @@ end
 # Generate a numbered menu, items passed must have a title property
 def menu(res, title = "Select one")
   lines = res.zip(1..).map do |match, count|
-    "%2d) #{match.fetch(:title)}" % count
+    format("%2d) %s", count, match.fetch(:title))
   end
-  $stderr.puts "\n" + lines.join("\n") + "\n\n"
+  $stderr.puts format("\n%s\n\n", lines.join("\n"))
   $stderr.print title.sub(/:?$/,": ")
 
   selection = Integer $stdin.readline(:chomp => true)
