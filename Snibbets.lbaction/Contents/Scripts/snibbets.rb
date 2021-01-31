@@ -86,7 +86,7 @@ def menu(res, title = "Select one")
   $stderr.print title.sub(/:?$/,": ")
 
   selection = Integer $stdin.readline(:chomp => true)
-  unless (1..res.length).include? selection
+  unless (1..res.length).include?(selection)
     $stderr.puts "Out of range"
     return menu(res, title)
   end
