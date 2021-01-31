@@ -188,13 +188,11 @@ def parse_options
 end
 
 def construct_query(options)
-  query = if options[:launchbar] && STDIN.stat.size > 0
-    STDIN.read.force_encoding('utf-8')
+  if options[:launchbar] && STDIN.stat.size > 0
+    return STDIN.read.force_encoding('utf-8')
   else
-    ARGV.join(" ")  # If ARGV is empty, so is the query.
+    return ARGV.join(" ")  # If ARGV is empty, so is the query.
   end
-
-  return query
 end
 
 def validate_query!(query, optparse)
