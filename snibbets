@@ -28,7 +28,15 @@ class String
   end
 
   def strip_fences
-    gsub(/(?:^|.*?\n)(`{3,})(\w+)?(.*?)\n\1.*/m) {|m| $3.strip }
+    gsub(/
+      (?:^|.*?\n)       # Match either the line start or non-fence text,
+      (?<fence> `{3,})  # then the opening fence
+      (?: \w*)          # followed maybe by some word (eg language mode),
+      (?<code> .*?)\n   # followed by some code,
+      \k<fence>         # then the closing fence,
+      .*                # and ignore anything else.
+      /xm
+    ) { |_match| Regexp.last_match[:code].strip }
   end
 
   # remove outside comments, fences, and indentation
