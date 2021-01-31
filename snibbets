@@ -64,19 +64,22 @@ class String
     code.join("\n")
   end
 
+  # Returns an optional Hash with the section's title (from an ATX header) and code.
+  def parse_sections(part)
+    first, *rest = part.split("\n")
+    title = first.strip.sub(/[.:]$/, '')
+    code = rest.join("\n").clean_code.strip
+    { title: title, code: code } unless code.empty?  # nil for empty code.
+  end
+
   # Returns an array of snippets, with a title from the preceding header line.
   def snippets
     # Split content by ATX headers. Everything on the line after the #
     # becomes the title, code is gleaned from text between that and the
     # next ATX header (or end)
-    parts = self.split(/^#+/)[1..]
-
-    parts.map do |part|
-      first, *rest = part.split("\n")
-      title = first.strip.sub(/[.:]$/, '')
-      code = rest.join("\n").clean_code.strip
-      code.empty? ? {} : { title: title, code: code }
-    end.reject(&:empty?)  # Filter out sections without code.
+    split(/^#+/)[1..]
+      .map(&method(:parse_sections))
+      .reject(&:nil?)  # Filters out nil for empty code.
   end
 end
 
