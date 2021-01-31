@@ -76,7 +76,7 @@ def quit
 end
 
 # Generate a numbered menu, items passed must have a title property
-def menu(res,title="Select one")
+def menu(res, title = "Select one")
   lines = res.zip(1..).map do |match, count|
     "%2d) #{match['title']}" % count
   end
@@ -86,7 +86,7 @@ def menu(res,title="Select one")
   selection = Integer $stdin.readline(:chomp => true)
   unless (1..res.length).include? selection
     $stderr.puts "Out of range"
-    return menu(res,title)
+    return menu(res, title)
   end
   return res[selection - 1]
 rescue ArgumentError, Interrupt, EOFError => e
@@ -137,7 +137,7 @@ def parse_options
   optparse = OptionParser.new do|opts|
     opts.banner = "Usage: #{File.basename(__FILE__)} [options] query"
 
-    opts.on("-h","--help",'Display this screen') do
+    opts.on("-h", "--help", 'Display this screen') do
       puts optparse
       Process.exit 0
     end
