@@ -1,5 +1,14 @@
 # Snibbets
 
+> _[robjwells](https://github.com/robjwells) 2021-01-31:_
+>
+> Thanks for checking out this fork, but you probably want
+> [Brett’s original repo](https://github.com/ttscoff/snibbets).
+>
+> This repo contains (minor!) customisations for my own use
+> and a few (minor!) bug fixes but most of the changes were
+> made to give me a chance to learn a bit of Ruby.
+
 A tool for accessing code snippets contained in a folder of plain text Markdown files.
 
 Snibbets allows me to keep code snippets in raw files, not relying on a dedicated code snippet app. I can collect and edit my snippets using a text editor, nvALT (nvUltra), or simply saving snippets from my clipboard to a text file using *NIX redirection on the command line. I can add descriptive names and extended descriptions/notes to code snippets using standard Markdown.
@@ -57,7 +66,7 @@ The menu currently causes some issues with piping, so running `snibbets [search 
 
 ### Installation
 
-The LaunchBar action can be installed simply by double clicking the `.lbaction` file in Finder. The CLI is not required for the LaunchBar action to function. 
+The LaunchBar action can be installed simply by double clicking the `.lbaction` file in Finder. The CLI is not required for the LaunchBar action to function.
 
 Once installed, run the action (type `snib` and hit return on the result) to select your Snippets folder.
 
