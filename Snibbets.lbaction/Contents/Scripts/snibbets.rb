@@ -66,7 +66,7 @@ class String
       title = first.strip.sub(/[.:]$/, '')
       code = rest.join("\n").clean_code.strip
       code.empty? ? {} : { 'title' => title, 'code' => code }
-    end.reject { |x| x.empty? }  # Filter out sections without code.
+    end.reject(&:empty?)  # Filter out sections without code.
   end
 end
 
