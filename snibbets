@@ -14,26 +14,24 @@ $search_path = File.expand_path(
 class String
   # Are there multiple snippets (indicated by ATX headers)
   def multiple?
-    self.scan(/^#+/).length > 1
+    scan(/^#+/).length > 1
   end
 
   # Is the snippet in this block fenced?
   def fenced?
-    count = self.scan(/^```/).length
+    count = scan(/^```/).length
     count > 1 && count.even?
   end
 
   def rx
-    ".*" + self.gsub(/\s+/,'.*') + ".*"
+    ".*" + gsub(/\s+/,'.*') + ".*"
   end
 
   # remove outside comments, fences, and indentation
   def clean_code
-    block = self
-
     # if it's a fenced code block, just discard the fence and everything
     # outside it
-    if block.fenced?
+    if fenced?
       return block.gsub(/(?:^|.*?\n)(`{3,})(\w+)?(.*?)\n\1.*/m) {|m| $3.strip }
     end
 
@@ -42,7 +40,7 @@ class String
     indent = nil
     inblock = false
     code = []
-    block.split(/\n/).each {|line|
+    split(/\n/).each {|line|
       if line.strip.empty? && inblock
         code.push(line)
       elsif line =~ /^( {4,}|\t+)/
