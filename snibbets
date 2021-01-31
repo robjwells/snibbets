@@ -104,22 +104,18 @@ def menu(res,title="Select one")
 end
 
 # Search the snippets directory for query using Spotlight (mdfind)
-def search_spotlight(query,folder,try=0)
+def search_spotlight(query, folder, first_try = true)
   # First try only search by filenames
-  nameonly = try > 0 ? '' : '-name '
-
+  nameonly = first_try ? '-name ' : ''
   matches = %x{mdfind -onlyin "#{folder}" #{nameonly}'#{query}'}.strip
 
   results = matches.split(/\n/).map do |line|
-    {
-      'title' => File.basename(line, '.md'),
-      'path' => line
-    }
+    { 'title' => File.basename(line, '.*'), 'path' => line }
   end
 
-  if results.empty? && try == 0
+  if results.empty? && first_try
       # if no results on the first try, try again searching all text
-      return search_spotlight(query,folder,1)
+      return search_spotlight(query, folder, false)
   end
 
   return results
