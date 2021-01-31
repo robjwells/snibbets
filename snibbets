@@ -47,8 +47,8 @@ class String
         code.push(line)
       elsif line =~ /^( {4,}|\t+)/
         inblock = true
-        indent ||= Regexp.new("^#{$1}")
-        code.push(line.sub(indent,''))
+        indent ||= $1
+        code.push(line.delete_prefix(indent))
       else
         inblock = false
       end
