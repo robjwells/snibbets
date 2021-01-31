@@ -27,13 +27,15 @@ class String
     ".*" + gsub(/\s+/,'.*') + ".*"
   end
 
+  def strip_fences
+      gsub(/(?:^|.*?\n)(`{3,})(\w+)?(.*?)\n\1.*/m) {|m| $3.strip }
+  end
+
   # remove outside comments, fences, and indentation
   def clean_code
     # if it's a fenced code block, just discard the fence and everything
     # outside it
-    if fenced?
-      return block.gsub(/(?:^|.*?\n)(`{3,})(\w+)?(.*?)\n\1.*/m) {|m| $3.strip }
-    end
+    return strip_fences if fenced?
 
     # assume it's indented code, discard non-indented lines and outdent
     # the rest
