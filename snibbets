@@ -67,7 +67,7 @@ class String
       first, *rest = part.split("\n")
       title = first.strip.sub(/[.:]$/, '')
       code = rest.join("\n").clean_code.strip
-      code.empty? ? {} : { 'title' => title, 'code' => code }
+      code.empty? ? {} : { :title => title, :code => code }
     end.reject(&:empty?)  # Filter out sections without code.
   end
 end
@@ -80,7 +80,7 @@ end
 # Generate a numbered menu, items passed must have a title property
 def menu(res, title = "Select one")
   lines = res.zip(1..).map do |match, count|
-    "%2d) #{match['title']}" % count
+    "%2d) #{match[:title]}" % count
   end
   $stderr.puts "\n" + lines.join("\n") + "\n\n"
   $stderr.print title.sub(/:?$/,": ")
@@ -102,7 +102,7 @@ def search_spotlight(query, folder, first_try: true)
   matches = %x{mdfind -onlyin "#{folder}" #{nameonly}'#{query}'}.strip
 
   results = matches.split(/\n/).map do |line|
-    { 'title' => File.basename(line, '.*'), 'path' => line }
+    { :title => File.basename(line, '.*'), :path => line }
   end
 
   if results.empty? && first_try
@@ -126,7 +126,7 @@ def search(query, folder, first_try: true)
   matches = %x{#{cmd}}.strip
 
   results = matches.split(/\n/).map do |line|
-    { 'title' => File.basename(line, '.*'), 'path' => line }
+    { :title => File.basename(line, '.*'), :path => line }
   end
 
   # if no results on the first try, try again searching all text
@@ -193,25 +193,25 @@ end
 
 def build_launchbar_output(results)
   results.map do |result|
-    title = result["title"]
-    path = result["path"]
+    title = result[:title]
+    path = result[:path]
     snippets = IO.read(path).snippets
     next if snippets.empty?
 
     children = snippets.map do |snippet|
       {
-        'title' => snippet['title'],
-        'quickLookURL' => %Q{file://#{path}},
-        'action' => 'pasteIt',
-        'actionArgument' => snippet['code'],
-        'label' => 'Paste'
+        :title => snippet[:title],
+        :quickLookURL => %Q{file://#{path}},
+        :action => 'pasteIt',
+        :actionArgument => snippet[:code],
+        :label => 'Paste'
       }
     end
 
     {
-      'title' => title,
-      'quickLookURL' => %Q{file://#{path}},
-      'children' => children
+      :title => title,
+      :quickLookURL => %Q{file://#{path}},
+      :children => children
     }
   end
 end
@@ -224,7 +224,7 @@ results = search(query, options[:source])
 # No results.
 if results.empty?
   if options[:launchbar]
-    out = { 'title' => "No matching snippets found" }.to_json
+    out = { :title => "No matching snippets found" }.to_json
     $stdout.puts out
   else
     $stderr.puts "No results"
@@ -236,13 +236,13 @@ end
 if options[:launchbar]
   puts build_launchbar_output(results).to_json
 elsif !options[:interactive]
-  snippets = IO.read(results.first["path"]).snippets
-  code_only = snippets.map { |s| s["code"] }
+  snippets = IO.read(results.first[:path]).snippets
+  code_only = snippets.map { |s| s[:code] }
   output = options[:output] == 'json' ? snippets.to_json : code_only
   $stdout.puts output
 else
   chosen_file = menu(results, "Select a file")
-  snippets = IO.read(chosen_file["path"]).snippets
+  snippets = IO.read(chosen_file[:path]).snippets
 
   if snippets.empty?
     $stderr.puts "No snippets found"
@@ -250,5 +250,5 @@ else
   end
 
   chosen_snippet = menu(snippets, "Select snippet")
-  $stdout.puts chosen_snippet['code']
+  $stdout.puts chosen_snippet[:code]
 end
