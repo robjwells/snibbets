@@ -42,7 +42,7 @@ class String
     indent = nil
     inblock = false
     code = []
-    split(/\n/).each {|line|
+    split("\n").each {|line|
       if line.strip.empty? && inblock
         code.push(line)
       elsif line =~ /^( {4,}|\t+)/
@@ -101,7 +101,7 @@ def search_spotlight(query, folder, first_try: true)
   nameonly = first_try ? '-name ' : ''
   matches = %x{mdfind -onlyin "#{folder}" #{nameonly}'#{query}'}.strip
 
-  results = matches.split(/\n/).map do |line|
+  results = matches.split("\n").map do |line|
     { title: File.basename(line, '.*'), path: line }
   end
 
@@ -125,7 +125,7 @@ def search(query, folder, first_try: true)
 
   matches = %x{#{cmd}}.strip
 
-  results = matches.split(/\n/).map do |line|
+  results = matches.split("\n").map do |line|
     { title: File.basename(line, '.*'), path: line }
   end
 
