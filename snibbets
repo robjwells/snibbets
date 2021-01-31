@@ -83,7 +83,7 @@ def menu(res,title="Select one")
   $stderr.puts "\n" + lines.join("\n") + "\n\n"
 
   begin
-    $stderr.printf(title.sub(/:?$/,": "),res.length)
+    $stderr.print(title.sub(/:?$/,": "), res.length)
     line = $stdin.readline(:chomp => true)
     quit unless line =~ /^[0-9]/
     line = line.to_i
