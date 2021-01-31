@@ -84,15 +84,14 @@ def menu(res,title="Select one")
 
   begin
     $stderr.printf(title.sub(/:?$/,": "),res.length)
-    while line = $stdin.readline(:chomp => true)
-      quit unless line =~ /^[0-9]/
-      line = line.to_i
-      if (line > 0 && line <= res.length)
-        return res[line - 1]
-      else
-        $stderr.puts "Out of range"
-        return menu(res,title)
-      end
+    line = $stdin.readline(:chomp => true)
+    quit unless line =~ /^[0-9]/
+    line = line.to_i
+    if (line > 0 && line <= res.length)
+      return res[line - 1]
+    else
+      $stderr.puts "Out of range"
+      return menu(res,title)
     end
   rescue Interrupt, EOFError => e
     quit
