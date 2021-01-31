@@ -67,7 +67,7 @@ class String
       first, *rest = part.split("\n")
       title = first.strip.sub(/[.:]$/, '')
       code = rest.join("\n").clean_code.strip
-      code.empty? ? {} : { :title => title, :code => code }
+      code.empty? ? {} : { title: title, code: code }
     end.reject(&:empty?)  # Filter out sections without code.
   end
 end
@@ -102,7 +102,7 @@ def search_spotlight(query, folder, first_try: true)
   matches = %x{mdfind -onlyin "#{folder}" #{nameonly}'#{query}'}.strip
 
   results = matches.split(/\n/).map do |line|
-    { :title => File.basename(line, '.*'), :path => line }
+    { title: File.basename(line, '.*'), path: line }
   end
 
   if results.empty? && first_try
@@ -126,7 +126,7 @@ def search(query, folder, first_try: true)
   matches = %x{#{cmd}}.strip
 
   results = matches.split(/\n/).map do |line|
-    { :title => File.basename(line, '.*'), :path => line }
+    { title: File.basename(line, '.*'), path: line }
   end
 
   # if no results on the first try, try again searching all text
@@ -200,18 +200,18 @@ def build_launchbar_output(results)
 
     children = snippets.map do |snippet|
       {
-        :title => snippet[:title],
-        :quickLookURL => %Q{file://#{path}},
-        :action => 'pasteIt',
-        :actionArgument => snippet[:code],
-        :label => 'Paste'
+        title: snippet[:title],
+        quickLookURL: %Q{file://#{path}},
+        action: 'pasteIt',
+        actionArgument: snippet[:code],
+        label: 'Paste'
       }
     end
 
     {
-      :title => title,
-      :quickLookURL => %Q{file://#{path}},
-      :children => children
+      title: title,
+      quickLookURL: %Q{file://#{path}},
+      children: children
     }
   end
 end
@@ -224,7 +224,7 @@ results = search(query, options[:source])
 # No results.
 if results.empty?
   if options[:launchbar]
-    out = { :title => "No matching snippets found" }.to_json
+    out = { title: "No matching snippets found" }.to_json
     $stdout.puts out
   else
     $stderr.puts "No results"
