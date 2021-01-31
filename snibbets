@@ -145,60 +145,69 @@ def search(query, folder, first_try = true)
   return results
 end
 
+def parse_options
+  options = {}
 
-options = {}
+  optparse = OptionParser.new do|opts|
+    opts.banner = "Usage: #{File.basename(__FILE__)} [options] query"
 
-optparse = OptionParser.new do|opts|
-  opts.banner = "Usage: #{File.basename(__FILE__)} [options] query"
-
-  opts.on("-h","--help",'Display this screen') do
-    puts optparse
-    Process.exit 0
-  end
-
-  # Set defaults.
-  options[:interactive] = true
-  options[:launchbar] = false
-  options[:output] = "raw"
-  options[:source] = File.expand_path($search_path)
-
-  opts.on( '-q', '--quiet', 'Skip menus and display first match') do
-    options[:interactive] = false
-  end
-
-  valid_formats = %w(json launchbar lb raw)
-  opts.on( '-o', '--output FORMAT', "Output format (#{valid_formats.join(', ')})" ) do |outformat|
-    outformat = outformat.strip.downcase
-    if outformat =~ /^(lb|launchbar)$/
-      options[:launchbar] = true
-      options[:interactive] = false
-    else
-      options[:output] = outformat if valid_formats.include?(outformat)
+    opts.on("-h","--help",'Display this screen') do
+      puts optparse
+      Process.exit 0
     end
+
+    # Set defaults.
+    options[:interactive] = true
+    options[:launchbar] = false
+    options[:output] = "raw"
+    options[:source] = File.expand_path($search_path)
+
+    opts.on( '-q', '--quiet', 'Skip menus and display first match') do
+      options[:interactive] = false
+    end
+
+    valid_formats = %w(json launchbar lb raw)
+    opts.on( '-o', '--output FORMAT', "Output format (#{valid_formats.join(', ')})" ) do |outformat|
+      outformat = outformat.strip.downcase
+      if outformat =~ /^(lb|launchbar)$/
+        options[:launchbar] = true
+        options[:interactive] = false
+      else
+        options[:output] = outformat if valid_formats.include?(outformat)
+      end
+    end
+
+    opts.on('-s', '--source FOLDER', 'Snippets folder to search') do |folder|
+      options[:source] = File.expand_path(folder)
+    end
+
   end
 
-  opts.on('-s', '--source FOLDER', 'Snippets folder to search') do |folder|
-    options[:source] = File.expand_path(folder)
+  optparse.parse!
+  return [options, optparse.help]
+end
+
+def construct_query(options)
+  query = if options[:launchbar] && STDIN.stat.size > 0
+    STDIN.read.force_encoding('utf-8')
+  else
+    ARGV.join(" ")  # If ARGV is empty, so is the query.
   end
 
+  return query
 end
 
-optparse.parse!
-
-query = if options[:launchbar] && STDIN.stat.size > 0
-  STDIN.read.force_encoding('utf-8')
-else
-  ARGV.join(" ")  # If ARGV is empty, so is the query.
+def validate_query!(query, optparse)
+  if query.strip.empty?
+    puts "No search query"
+    puts optparse
+    Process.exit 1
+  end
 end
 
-query = CGI.unescape(query)
-
-if query.strip.empty?
-  puts "No search query"
-  puts optparse
-  Process.exit 1
-end
-
+options, help_message = parse_options()
+query = CGI.unescape(construct_query(options))
+validate_query!(query, help_message)
 results = search(query, options[:source])
 
 # No results.
