@@ -14,6 +14,7 @@
 > - fe82601 Handle end-of-file (Ctrl-D) in menu
 > - 71f2fd1 Return result of recursive menu call
 > - 882c36a Prevent false positives from find
+> - 586c246 LaunchBar: Fix pasting
 >
 > And added the following “features” (really customisations for me!):
 >
