@@ -28,7 +28,7 @@ class String
   end
 
   def strip_fences
-      gsub(/(?:^|.*?\n)(`{3,})(\w+)?(.*?)\n\1.*/m) {|m| $3.strip }
+    gsub(/(?:^|.*?\n)(`{3,})(\w+)?(.*?)\n\1.*/m) {|m| $3.strip }
   end
 
   # remove outside comments, fences, and indentation
