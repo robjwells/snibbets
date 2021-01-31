@@ -96,7 +96,7 @@ rescue ArgumentError, Interrupt, EOFError
 end
 
 # Search the snippets directory for query using Spotlight (mdfind)
-def search_spotlight(query, folder, first_try = true)
+def search_spotlight(query, folder, first_try: true)
   # First try only search by filenames
   nameonly = first_try ? '-name ' : ''
   matches = %x{mdfind -onlyin "#{folder}" #{nameonly}'#{query}'}.strip
@@ -107,14 +107,14 @@ def search_spotlight(query, folder, first_try = true)
 
   if results.empty? && first_try
       # if no results on the first try, try again searching all text
-      return search_spotlight(query, folder, false)
+      return search_spotlight(query, folder, first_try: false)
   end
 
   results
 end
 
 # Search the snippets directory for query using find and grep
-def search(query, folder, first_try = true)
+def search(query, folder, first_try: true)
   # First try only search by filenames
 
   cmd = if first_try
@@ -130,7 +130,7 @@ def search(query, folder, first_try = true)
   end
 
   # if no results on the first try, try again searching all text
-  results.empty? && first_try ? search(query, folder, false) : results
+  results.empty? && first_try ? search(query, folder, first_try: false) : results
 end
 
 def parse_options
