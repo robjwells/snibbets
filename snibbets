@@ -8,7 +8,7 @@ require 'cgi'
 require 'logger'
 
 $search_path = File.expand_path(
-  ENV['SNIBBETS_PATH'] || "~/Dropbox/notes/snippets"
+  ENV['SNIBBETS_PATH'] || '~/Dropbox/notes/snippets'
 )
 
 class String
@@ -78,16 +78,16 @@ def quit
 end
 
 # Generate a numbered menu, items passed must have a title property
-def menu(res, title = "Select one")
+def menu(res, title = 'Select one')
   lines = res.zip(1..).map do |match, count|
-    format("%2d) %s", count, match.fetch(:title))
+    format('%2d) %s', count, match.fetch(:title))
   end
   $stderr.puts format("\n%s\n\n", lines.join("\n"))
-  $stderr.print title.sub(/:?$/,": ")
+  $stderr.print title.sub(/:?$/,': ')
 
   selection = Integer $stdin.readline(:chomp => true)
   unless (1..res.length).include?(selection)
-    $stderr.puts "Out of range"
+    $stderr.puts 'Out of range'
     return menu(res, title)
   end
   return res[selection - 1]
@@ -139,7 +139,7 @@ def parse_options
   optparse = OptionParser.new do |opts|
     opts.banner = "Usage: #{File.basename(__FILE__)} [options] query"
 
-    opts.on("-h", "--help", 'Display this screen') do
+    opts.on('-h', '--help', 'Display this screen') do
       puts optparse
       Process.exit 0
     end
@@ -147,7 +147,7 @@ def parse_options
     # Set defaults.
     options[:interactive] = true
     options[:launchbar] = false
-    options[:output] = "raw"
+    options[:output] = 'raw'
     options[:source] = File.expand_path($search_path)
 
     opts.on( '-q', '--quiet', 'Skip menus and display first match') do
@@ -179,13 +179,13 @@ def construct_query(options)
   if options.fetch(:launchbar) && STDIN.stat.size > 0
     STDIN.read.force_encoding('utf-8')
   else
-    ARGV.join(" ")  # If ARGV is empty, so is the query.
+    ARGV.join(' ')  # If ARGV is empty, so is the query.
   end
 end
 
 def validate_query!(query, optparse)
   if query.strip.empty?
-    puts "No search query"
+    puts 'No search query'
     puts optparse
     Process.exit 1
   end
@@ -223,10 +223,10 @@ results = search(query, options.fetch(:source))
 # No results.
 if results.empty?
   if options.fetch(:launchbar)
-    out = { title: "No matching snippets found" }.to_json
+    out = { title: 'No matching snippets found' }.to_json
     $stdout.puts out
   else
-    $stderr.puts "No results"
+    $stderr.puts 'No results'
   end
   Process.exit 0
 end
@@ -240,14 +240,14 @@ elsif !options.fetch(:interactive)
   output = options.fetch(:output) == 'json' ? snippets.to_json : code_only
   $stdout.puts output
 else
-  chosen_file = menu(results, "Select a file")
+  chosen_file = menu(results, 'Select a file')
   snippets = IO.read(chosen_file.fetch(:path)).snippets
 
   if snippets.empty?
-    $stderr.puts "No snippets found"
+    $stderr.puts 'No snippets found'
     Process.exit 0
   end
 
-  chosen_snippet = menu(snippets, "Select snippet")
+  chosen_snippet = menu(snippets, 'Select snippet')
   $stdout.puts chosen_snippet.fetch(:code)
 end
