@@ -205,25 +205,8 @@ def validate_query!(query, optparse)
   end
 end
 
-options, help_message = parse_options()
-query = CGI.unescape(construct_query(options))
-validate_query!(query, help_message)
-results = search(query, options[:source])
-
-# No results.
-if results.empty?
-  if options[:launchbar]
-    out = { 'title' => "No matching snippets found" }.to_json
-    puts out
-  else
-    $stderr.puts "No results"
-  end
-  Process.exit 0
-end
-
-# At least some results.
-if options[:launchbar]
-  output = results.map do |result|
+def build_launchbar_output(results)
+  return results.map do |result|
     title = result["title"]
     path = result["path"]
     snippets = IO.read(path).snippets
@@ -245,8 +228,27 @@ if options[:launchbar]
       'children' => children
     }
   end
+end
 
-  puts output.to_json
+options, help_message = parse_options()
+query = CGI.unescape(construct_query(options))
+validate_query!(query, help_message)
+results = search(query, options[:source])
+
+# No results.
+if results.empty?
+  if options[:launchbar]
+    out = { 'title' => "No matching snippets found" }.to_json
+    puts out
+  else
+    $stderr.puts "No results"
+  end
+  Process.exit 0
+end
+
+# At least some results.
+if options[:launchbar]
+  puts build_launchbar_output(results).to_json
 elsif !options[:interactive]
   snippets = IO.read(results[0]["path"]).snippets
   code_only = snippets.map { |s| s["code"] }
