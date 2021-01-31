@@ -51,7 +51,7 @@ class String
     inblock = false
     code = []
     split("\n").each {|line|
-      if line.strip.empty? && inblock
+      if inblock && line.strip.empty?
         code.push(line)
       elsif line =~ /^( {4,}|\t+)/
         inblock = true
