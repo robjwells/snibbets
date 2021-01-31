@@ -134,7 +134,7 @@ end
 def parse_options
   options = {}
 
-  optparse = OptionParser.new do|opts|
+  optparse = OptionParser.new do |opts|
     opts.banner = "Usage: #{File.basename(__FILE__)} [options] query"
 
     opts.on("-h", "--help", 'Display this screen') do
