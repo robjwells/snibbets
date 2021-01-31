@@ -239,7 +239,7 @@ results = search(query, options[:source])
 if results.empty?
   if options[:launchbar]
     out = { 'title' => "No matching snippets found" }.to_json
-    puts out
+    $stdout.puts out
   else
     $stderr.puts "No results"
   end
