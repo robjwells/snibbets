@@ -89,7 +89,7 @@ def menu(res, title = "Select one")
     return menu(res, title)
   end
   return res[selection - 1]
-rescue ArgumentError, Interrupt, EOFError => e
+rescue ArgumentError, Interrupt, EOFError
   quit
 end
 
