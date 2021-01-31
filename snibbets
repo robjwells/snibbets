@@ -14,17 +14,17 @@ $search_path = File.expand_path(
 class String
   # Are there multiple snippets (indicated by ATX headers)
   def multiple?
-    return self.scan(/^#+/).length > 1
+    self.scan(/^#+/).length > 1
   end
 
   # Is the snippet in this block fenced?
   def fenced?
     count = self.scan(/^```/).length
-    return count > 1 && count.even?
+    count > 1 && count.even?
   end
 
   def rx
-    return ".*" + self.gsub(/\s+/,'.*') + ".*"
+    ".*" + self.gsub(/\s+/,'.*') + ".*"
   end
 
   # remove outside comments, fences, and indentation
@@ -63,14 +63,12 @@ class String
     # next ATX header (or end)
     parts = self.split(/^#+/)[1..]
 
-    sections = parts.map do |part|
+    parts.map do |part|
       first, *rest = part.split("\n")
       title = first.strip.sub(/[.:]$/, '')
       code = rest.join("\n").clean_code.strip
       code.empty? ? {} : { 'title' => title, 'code' => code }
     end.reject { |x| x.empty? }  # Filter out sections without code.
-
-    return sections
   end
 end
 
@@ -118,7 +116,7 @@ def search_spotlight(query, folder, first_try = true)
       return search_spotlight(query, folder, false)
   end
 
-  return results
+  results
 end
 
 # Search the snippets directory for query using find and grep
@@ -137,12 +135,8 @@ def search(query, folder, first_try = true)
     { 'title' => File.basename(line, '.*'), 'path' => line }
   end
 
-  if results.empty? && first_try
-    # if no results on the first try, try again searching all text
-    return search(query, folder, false)
-  end
-
-  return results
+  # if no results on the first try, try again searching all text
+  results.empty? && first_try ? search(query, folder, false) : results
 end
 
 def parse_options
@@ -184,14 +178,14 @@ def parse_options
   end
 
   optparse.parse!
-  return [options, optparse.help]
+  [options, optparse.help]
 end
 
 def construct_query(options)
   if options[:launchbar] && STDIN.stat.size > 0
-    return STDIN.read.force_encoding('utf-8')
+    STDIN.read.force_encoding('utf-8')
   else
-    return ARGV.join(" ")  # If ARGV is empty, so is the query.
+    ARGV.join(" ")  # If ARGV is empty, so is the query.
   end
 end
 
@@ -204,7 +198,7 @@ def validate_query!(query, optparse)
 end
 
 def build_launchbar_output(results)
-  return results.map do |result|
+  results.map do |result|
     title = result["title"]
     path = result["path"]
     snippets = IO.read(path).snippets
