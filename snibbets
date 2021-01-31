@@ -87,7 +87,7 @@ def menu(res,title="Select one")
     line = $stdin.readline(:chomp => true)
     quit unless line =~ /^[0-9]/
     line = line.to_i
-    if (line > 0 && line <= res.length)
+    if (1..res.length).include? line
       return res[line - 1]
     else
       $stderr.puts "Out of range"
