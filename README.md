@@ -8,6 +8,22 @@
 > This repo contains (minor!) customisations for my own use
 > and a few (minor!) bug fixes but most of the changes were
 > made to give me a chance to learn a bit of Ruby.
+>
+> As a summary, I made the following bugfixes:
+>
+> - fe82601 Handle end-of-file (Ctrl-D) in menu
+> - 71f2fd1 Return result of recursive menu call
+> - 882c36a Prevent false positives from find
+>
+> And added the following “features” (really customisations for me!):
+>
+> - 4918817 Enable use of SNIBBETS_PATH environment variable
+> - 6833253 Always return a list of snippets, even if just one
+> - 974fcfb Ruby: Make paste the default LaunchBar action
+> - 0f3ae07 LaunchBar: allow navigation in addition to search
+>
+> Finally, I’d just like to express my gratitude to Brett for writing
+> `snibbets` in the first place! It’s great!
 
 A tool for accessing code snippets contained in a folder of plain text Markdown files.
 
