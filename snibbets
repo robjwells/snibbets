@@ -193,8 +193,7 @@ end
 
 def build_launchbar_output(results)
   results.map do |result|
-    title = result.fetch(:title)
-    path = result.fetch(:path)
+    title, path = result.values_at(:title, :path)
     snippets = IO.read(path).snippets
     next if snippets.empty?
 
