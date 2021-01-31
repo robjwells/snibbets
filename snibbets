@@ -236,7 +236,7 @@ end
 if options[:launchbar]
   puts build_launchbar_output(results).to_json
 elsif !options[:interactive]
-  snippets = IO.read(results[0]["path"]).snippets
+  snippets = IO.read(results.first["path"]).snippets
   code_only = snippets.map { |s| s["code"] }
   output = options[:output] == 'json' ? snippets.to_json : code_only
   $stdout.puts output
