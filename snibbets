@@ -126,10 +126,10 @@ def search(query, folder, first_try = true)
   # First try only search by filenames
 
   cmd = if first_try
-    %Q{find "#{folder}" -iregex '^#{Regexp.escape(folder)}/#{query.rx}'}
-  else
-    %Q{grep -iEl '#{query.rx}' "#{folder}/"*}
-  end
+          %Q{find "#{folder}" -iregex '^#{Regexp.escape(folder)}/#{query.rx}'}
+        else
+          %Q{grep -iEl '#{query.rx}' "#{folder}/"*}
+        end
 
   matches = %x{#{cmd}}.strip
 
