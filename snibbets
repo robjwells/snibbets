@@ -82,18 +82,15 @@ def menu(res,title="Select one")
   end
   $stderr.puts "\n" + lines.join("\n") + "\n\n"
   $stderr.print title.sub(/:?$/,": ")
-  begin
-    line = $stdin.readline(:chomp => true)
-    quit unless line =~ /^[0-9]/
-    line = line.to_i
-    unless (1..res.length).include? line
-      $stderr.puts "Out of range"
-      return menu(res,title)
-    end
-    return res[line - 1]
-  rescue Interrupt, EOFError => e
-    quit
+
+  selection = Integer $stdin.readline(:chomp => true)
+  unless (1..res.length).include? selection
+    $stderr.puts "Out of range"
+    return menu(res,title)
   end
+  return res[selection - 1]
+rescue ArgumentError, Interrupt, EOFError => e
+  quit
 end
 
 # Search the snippets directory for query using Spotlight (mdfind)
