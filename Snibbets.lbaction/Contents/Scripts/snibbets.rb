@@ -36,7 +36,7 @@ class String
       \k<fence>         # then the closing fence,
       .*                # and ignore anything else.
       /xm
-    ) { |_match| Regexp.last_match[:code].strip }
+    ) { |_match| Regexp.last_match(:code).strip }
   end
 
   # remove outside comments, fences, and indentation
