@@ -134,10 +134,10 @@ def search(query, folder, first_try: true)
           %Q{grep -iEl '#{query.rx}' "#{folder}/"*}
         end
 
-  matches = %x{#{cmd}}.strip
-
-  results = matches.split("\n").map do |line|
-    { title: File.basename(line, '.*'), path: line }
+  results = %x{#{cmd}}.lines(chomp: true).map do |path|
+    { title: File.basename(path, '.*'), path: path }
+  end.reject do |obj|
+    obj[:title].start_with?(".")
   end
 
   # if no results on the first try, try again searching all text
