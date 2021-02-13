@@ -8,6 +8,8 @@
 	<string>Snibbets</string>
 	<key>LBAbbreviation</key>
 	<string>snib</string>
+	<key>CFBundleIconFile</key>
+	<string>font-awesome:fa-code</string>
 	<key>LBDebugLogEnabled</key>
 	<true/>
 	<key>LBDescription</key>
