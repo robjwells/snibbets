@@ -129,15 +129,13 @@ def search(query, folder, first_try: true)
   # First try only search by filenames
 
   cmd = if first_try
-          %Q{find "#{folder}" -iregex '^#{Regexp.escape(folder)}/#{query.rx}'}
+          %Q{find "#{folder}" -iregex '^#{Regexp.escape(folder)}/#{query.rx}' -and -not -name '.*' }
         else
           %Q{grep -iEl '#{query.rx}' "#{folder}/"*}
         end
 
   results = %x{#{cmd}}.lines(chomp: true).map do |path|
     { title: File.basename(path, '.*'), path: path }
-  end.reject do |obj|
-    obj[:title].start_with?(".")
   end
 
   # if no results on the first try, try again searching all text
